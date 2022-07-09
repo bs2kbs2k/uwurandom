@@ -4,7 +4,7 @@
   # Nixpkgs / NixOS version to use.
   inputs.nixpkgs.url = "nixpkgs/nixos-21.05";
 
-  outputs = { self, nixpkgs, kernel, kmod }:
+  outputs = { self, nixpkgs }:
     let
 
       # to work with older version of flakes
@@ -21,6 +21,8 @@
 
       # Nixpkgs instantiated for supported system types.
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
+
+      kernel = nixpkgs.kernel;
 
     in
 
