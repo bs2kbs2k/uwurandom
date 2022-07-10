@@ -32,7 +32,6 @@
 
           src = ./.;
 
-          sourceRoot = "source/";
           hardeningDisable = [ "pic" "format" ];
           nativeBuildInputs = kernel.moduleBuildDependencies;
 
@@ -70,7 +69,6 @@
 
                   src = ./.;
 
-                  sourceRoot = "source/";
                   hardeningDisable = [ "pic" "format" ];
                   nativeBuildInputs = kernel.moduleBuildDependencies;
 
