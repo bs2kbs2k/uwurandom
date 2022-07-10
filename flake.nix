@@ -22,8 +22,6 @@
       # Nixpkgs instantiated for supported system types.
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
 
-      kernel = self.config.kernel;
-
     in
 
     {
@@ -32,17 +30,17 @@
       overlay = final: prev: {
 
         uwurandom = with final; stdenv.mkDerivation rec {
-          name = "uwurandom-${version}-${kernel.version}";
+          name = "uwurandom-${version}-${final.kernel.version}";
 
           src = ./.;
 
           sourceRoot = "source/";
           hardeningDisable = [ "pic" "format" ];
-          nativeBuildInputs = kernel.moduleBuildDependencies;
+          nativeBuildInputs = final.kernel.moduleBuildDependencies;
 
           makeFlags = [
-            "KERNELRELEASE=${kernel.modDirVersion}"
-            "KERNEL_DIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
+            "KERNELRELEASE=${final.kernel.modDirVersion}"
+            "KERNEL_DIR=${final.kernel.dev}/lib/modules/${final.kernel.modDirVersion}/build"
             "INSTALL_MOD_PATH=$(out)"
           ];
         };
