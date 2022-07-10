@@ -59,7 +59,6 @@
         { pkgs, config, ... }:
         let
           kernel = config.boot.kernelPackages.kernel;
-          builtPackage = pkgs.uwurandom { kernel = config.boot.kernelPackages.kernel; };
         in
         {
           nixpkgs.overlays = [
@@ -84,7 +83,7 @@
             }
       ];
 
-          boot.extraModulePackages = [ builtPackage ];
+          boot.extraModulePackages = [ pkgs.uwurandom ];
         };
 
     };
