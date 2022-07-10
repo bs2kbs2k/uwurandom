@@ -59,11 +59,12 @@
         { pkgs, config, ... }:
         let
           kernel = config.boot.kernelPackages.kernel;
+          builtPackage = pkgs.uwurandom { kernel = config.boot.kernelPackages.kernel; };
         in
         {
           nixpkgs.overlays = [ self.overlay ];
 
-          boot.extraModulePackages = [ ( pkgs.uwurandom { kernel = config.boot.kernelPackages.kernel; } ) ];
+          boot.extraModulePackages = [ builtPackage ];
         };
 
     };
