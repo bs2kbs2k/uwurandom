@@ -81,7 +81,7 @@
 
               }
             )
-      ];
+          ];
 
           boot.extraModulePackages = [ pkgs.uwurandom ];
         };
