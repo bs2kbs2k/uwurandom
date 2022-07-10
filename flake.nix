@@ -19,51 +19,37 @@
       # Helper function to generate an attrset '{ x86_64-linux = f "x86_64-linux"; ... }'.
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
 
-      # Nixpkgs instantiated for supported system types.
-      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
-
     in
 
     {
-
-      # A Nixpkgs overlay.
-      overlay = kernel: {
-        final: prev: {
-
-          uwurandom = with final; stdenv.mkDerivation rec {
-            name = "uwurandom-${version}-${kernel.version}";
-
-            src = ./.;
-
-            sourceRoot = "source/";
-            hardeningDisable = [ "pic" "format" ];
-            nativeBuildInputs = kernel.moduleBuildDependencies;
-
-            makeFlags = [
-              "KERNELRELEASE=${kernel.modDirVersion}"
-              "KERNEL_DIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
-              "INSTALL_MOD_PATH=$(out)"
-            ];
-          };
-
-        }
-      };
-
-      # Provide some binary packages for selected system types.
-      packages = forAllSystems (system:
-        {
-          inherit (nixpkgsFor.${system}) uwurandom;
-        });
-
-      # The default package for 'nix build'. This makes sense if the
-      # flake provides only one package or there is a clear "main"
-      # package.
-      defaultPackage = forAllSystems (system: self.packages.${system}.uwurandom);
-
+      
       nixosModules.uwurandom =
         { pkgs, config, ... }:
+        let
+          kernel = config.boot.kernelPackages.kernel;
+        in
         {
-          nixpkgs.overlays = [ self.overlay config.boot.kernelPackages.kernel ];
+          nixpkgs.overlays = [
+            final: prev: {
+
+              uwurandom = with final; stdenv.mkDerivation rec {
+                name = "uwurandom-${version}-${kernel.version}";
+
+                src = ./.;
+
+                sourceRoot = "source/";
+                hardeningDisable = [ "pic" "format" ];
+                nativeBuildInputs = kernel.moduleBuildDependencies;
+
+                makeFlags = [
+                  "KERNELRELEASE=${kernel.modDirVersion}"
+                  "KERNEL_DIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
+                  "INSTALL_MOD_PATH=$(out)"
+                ];
+              };
+
+            }
+          ];
 
           boot.extraModulePackages = [ pkgs.uwurandom ];
         };
