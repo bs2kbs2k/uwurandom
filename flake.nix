@@ -63,7 +63,7 @@
         {
           nixpkgs.overlays = [ self.overlay ];
 
-          boot.extraModulePackages = [ pkgs.uwurandom { kernel = config.boot.kernelPackages.kernel; } ];
+          boot.extraModulePackages = [ ( pkgs.uwurandom config.boot.kernelPackages.kernel ) ];
         };
 
     };
