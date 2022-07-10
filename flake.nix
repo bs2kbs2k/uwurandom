@@ -62,7 +62,27 @@
           builtPackage = pkgs.uwurandom { kernel = config.boot.kernelPackages.kernel; };
         in
         {
-          nixpkgs.overlays = [ self.overlay ];
+          nixpkgs.overlays = [
+            final: prev: {
+
+              uwurandom = with final; stdenv.mkDerivation rec {
+                name = "uwurandom-${version}-${kernel.version}";
+
+                src = ./.;
+
+                sourceRoot = "source/";
+                hardeningDisable = [ "pic" "format" ];
+                nativeBuildInputs = kernel.moduleBuildDependencies;
+
+                makeFlags = [
+                  "KERNELRELEASE=${kernel.modDirVersion}"
+                  "KERNEL_DIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
+                  "INSTALL_MOD_PATH=$(out)"
+                ];
+              };
+
+            }
+      ];
 
           boot.extraModulePackages = [ builtPackage ];
         };
