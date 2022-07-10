@@ -27,20 +27,20 @@
     {
 
       # A Nixpkgs overlay.
-      overlay = final: prev: {
+      overlay = kernel: final: prev: {
 
         uwurandom = with final; stdenv.mkDerivation rec {
-          name = "uwurandom-${version}-${final.kernel.version}";
+          name = "uwurandom-${version}-${kernel.version}";
 
           src = ./.;
 
           sourceRoot = "source/";
           hardeningDisable = [ "pic" "format" ];
-          nativeBuildInputs = final.kernel.moduleBuildDependencies;
+          nativeBuildInputs = kernel.moduleBuildDependencies;
 
           makeFlags = [
-            "KERNELRELEASE=${final.kernel.modDirVersion}"
-            "KERNEL_DIR=${final.kernel.dev}/lib/modules/${final.kernel.modDirVersion}/build"
+            "KERNELRELEASE=${kernel.modDirVersion}"
+            "KERNEL_DIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
             "INSTALL_MOD_PATH=$(out)"
           ];
         };
@@ -57,6 +57,14 @@
       # flake provides only one package or there is a clear "main"
       # package.
       defaultPackage = forAllSystems (system: self.packages.${system}.uwurandom);
+
+      nixosModules.uwurandom =
+        { pkgs, config, ... }:
+        {
+          nixpkgs.overlays = [ ( self.overlay config.boot.kernelPackages.kernel ) ];
+
+          boot.extraModulePackages = [ pkgs.uwurandom ];
+        };
 
     };
 }
