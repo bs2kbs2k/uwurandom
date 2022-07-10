@@ -27,24 +27,26 @@
     {
 
       # A Nixpkgs overlay.
-      overlay = kernel: final: prev: {
+      overlay = kernel: {
+        final: prev: {
 
-        uwurandom = with final; stdenv.mkDerivation rec {
-          name = "uwurandom-${version}-${kernel.version}";
+          uwurandom = with final; stdenv.mkDerivation rec {
+            name = "uwurandom-${version}-${kernel.version}";
 
-          src = ./.;
+            src = ./.;
 
-          sourceRoot = "source/";
-          hardeningDisable = [ "pic" "format" ];
-          nativeBuildInputs = kernel.moduleBuildDependencies;
+            sourceRoot = "source/";
+            hardeningDisable = [ "pic" "format" ];
+            nativeBuildInputs = kernel.moduleBuildDependencies;
 
-          makeFlags = [
-            "KERNELRELEASE=${kernel.modDirVersion}"
-            "KERNEL_DIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
-            "INSTALL_MOD_PATH=$(out)"
-          ];
-        };
+            makeFlags = [
+              "KERNELRELEASE=${kernel.modDirVersion}"
+              "KERNEL_DIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
+              "INSTALL_MOD_PATH=$(out)"
+            ];
+          };
 
+        }
       };
 
       # Provide some binary packages for selected system types.
