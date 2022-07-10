@@ -22,7 +22,7 @@
       # Nixpkgs instantiated for supported system types.
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
 
-      kernel = self.kernel;
+      kernel = self.config.kernel;
 
     in
 
